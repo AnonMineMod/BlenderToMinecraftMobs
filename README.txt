@@ -1,0 +1,1 @@
+This repository combine all python files needed to export model and animation from blender to minecraft.
