@@ -16,7 +16,7 @@ fullName = bpy.path.basename(bpy.context.blend_data.filepath)
 name = os.path.splitext(fullName)[0]
 sTextureWidth = str(1024)
 sTextureHeight = str(512)
-package = "anonmine.godzilla"
+package = "anonmine.beastmod"
 outputPath = r'C:\Users\Guillaume\Documents\Blender\godzilla\\Channel' + extractActionName.title() + '.java'
 
 
