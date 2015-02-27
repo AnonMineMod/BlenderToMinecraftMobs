@@ -11,8 +11,8 @@ fullName = bpy.path.basename(bpy.context.blend_data.filepath)
 name = os.path.splitext(fullName)[0]
 sTextureWidth = str(2048)
 sTextureHeight = str(2048)
-package = "anonmine.godzilla"
-outputPath = r'C:\Users\Guillaume\Documents\Blender\godzilla\\' + name + '.java'
+package = "anonmine.beastmod"
+outputPath = r'.\\' + name + '.java'
 
 
 sHeader = '''
