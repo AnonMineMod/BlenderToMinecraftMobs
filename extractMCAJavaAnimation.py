@@ -17,9 +17,10 @@ name = os.path.splitext(fullName)[0]
 sTextureWidth = str(1024)
 sTextureHeight = str(512)
 package = "anonmine.beastmod"
-outputPath = r'.\\Channel' + extractActionName.title() + '.java'
+outputPath = r'C:\test\Channel' + extractActionName.title() + '.java'
+outputLog = r'C:\test\log'+ extractActionName.title()+'.log'
 
-
+Log = " "
 
 
 
@@ -51,40 +52,38 @@ def getKeyFrames(actionName):
 
 
 
-def extractKeyFrame(boneName,frameName):
+def extractKeyFrame(obj,frameName):
 
+    Log = " "
     sFrameName = frameName
-    pivot = bpy.data.objects[boneName+".emptyPivot"]
-    parentingPivot = bpy.data.objects[boneName+".emptyParentingPivot"]
-    parentingPivotParent = parentingPivot.parent
-    pivotParent = None
-    if (parentingPivotParent != None):
-        pivotParent = bpy.data.objects[parentingPivotParent.name.split(".")[0] + ".emptyPivot"]
-    
-    #sExtractKeyFrame = "\n\t\tKeyFrame "+sFrameName+" = new KeyFrame();"
-    sExtractKeyFrame = ''
-    
-    if (hasattr(pivot,'["mcRotationPoint"]')):
+    nameObj = obj.name.split('.')[0]
+    sExtractKeyFrame = ""
+    if (hasattr(obj,'["mcParentingPivot"]')):
         #pivot are usefull only for children 
-        if (pivot.children != () or parentingPivot.children != () ):
-            if (pivotParent == None):
-                mat_rot = mathutils.Matrix.Rotation(radians(180.0), 4, 'Z') 
-                matrixTransform = mat_rot * pivot.matrix_world
+        if (bpy.data.objects[nameObj+'.emptyPivot'].children != () or bpy.data.objects[nameObj+'.emptyParentingPivot'].children != () ):
+            
+            
+            objPivot = bpy.data.objects[nameObj+'.emptyPivot']
+            objParent = obj.parent
+            objParentPivot = None
+            if (objParent == None):
+                matrixTransform = obj.matrix_world
             else:
-                matrixTransform = pivotParent.matrix_world.inverted() * pivot.matrix_world
+                objParentPivot = bpy.data.objects[objParent.name.split('.')[0]+'.emptyPivot']
+                matrixTransform = (objParentPivot.matrix_world).inverted() * (objPivot.matrix_world )
                 
             position = matrixTransform.to_translation()
+            quat = (matrixTransform).to_quaternion()
+            
             
             sPos = str(-round(position[0],ndigits = 1) ) + 'F,' +str(round(position[2],ndigits = 1) ) + 'F,' +str(round(position[1],ndigits = 1) ) +'F'
-       
-            quat = (matrixTransform).to_quaternion()
             squat = str(-round(quat[1],ndigits = 7) ) + 'F,' +str(round(quat[3],ndigits = 7) ) + 'F,' +str(round(quat[2],ndigits = 7) ) +'F,' +str(round(quat[0],ndigits = 7) ) +'F'
       
-            sExtractKeyFrame += '\n\t\t' + sFrameName + '.modelRenderersRotations.put("' + boneName + '", new Quaternion('+squat+'));'
-            sExtractKeyFrame += '\n\t\t' + sFrameName + '.modelRenderersTranslations.put("' + boneName + '", new Vector3f('+sPos+'));'
+            sExtractKeyFrame += '\n\t\t' + sFrameName + '.modelRenderersRotations.put("' + nameObj + '", new Quaternion('+squat+'));'
+            sExtractKeyFrame += '\n\t\t' + sFrameName + '.modelRenderersTranslations.put("' + nameObj + '", new Vector3f('+sPos+'));'
 
-
-    return sExtractKeyFrame
+            Log += '\n\t\t' + nameObj + '(' + squat + ')' + '(' + sPos+ ')'
+    return (sExtractKeyFrame,Log)
 
 
 
@@ -93,10 +92,10 @@ def extractKeyFrame(boneName,frameName):
 layers = [True]*20
 scene.layers = layers
 sExtractChannel = '''
-package '''+package+'''.common.animations.'''+name.title()+''';
+package '''+package+'''.common.animations.'''+name.lower()+''';
 
-import '''+package+'''.common.MCACommonLibrary.animation.*;
-import '''+package+'''.common.MCACommonLibrary.math.*;
+import '''+package+'''.common.mca.commonlibrary.animation.*;
+import '''+package+'''.common.mca.commonlibrary.math.*;
 
 public class Channel'''+extractActionName.title()+''' extends Channel {
 	public Channel'''+extractActionName.title()+'''(String _name, float _fps, int _totalFrames, byte _mode) {
@@ -114,8 +113,11 @@ for frame in bonesKeyFrames:
     frameName = 'frame'+str(frame[0])
     sExtractChannel += '\n\t\t' +'KeyFrame frame'+str(frame[0])+' = new KeyFrame();'
     #time.sleep(0.5)
-    for boneName in frame[1]:
-        sExtractChannel += extractKeyFrame(boneName,frameName)
+    for obj in bpy.data.objects :
+        if (obj.name.replace(".emptyParentingPivot", "") in frame[1] and obj.type == 'EMPTY'):
+            sExtract, LogS = extractKeyFrame(obj,frameName)
+            sExtractChannel += sExtract
+            Log += LogS
     
     sExtractChannel += '\n\t\t' +'keyFrames.put('+str(frame[0])+','+ frameName +');'
 
@@ -130,4 +132,9 @@ print(sExtractChannel)
 
 fileObject = open(outputPath, 'w+')
 fileObject.write(sExtractChannel)
+fileObject.close()
+
+
+fileObject = open(outputLog, 'w+')
+fileObject.write(Log)
 fileObject.close()

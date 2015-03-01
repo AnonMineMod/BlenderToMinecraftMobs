@@ -12,8 +12,10 @@ name = os.path.splitext(fullName)[0]
 sTextureWidth = str(2048)
 sTextureHeight = str(2048)
 package = "anonmine.beastmod"
-outputPath = r'.\\' + name + '.java'
+outputPath = r'C:\test\\' + name + '.java'
+outputLog = r'C:\test\log' + name + '.log'
 
+Log = " "
 
 sHeader = '''
 package '''+package+'''.client.models;
@@ -58,7 +60,6 @@ sConstructor = '''
 
 '''
 
-mSymmetryXZ = mathutils.Matrix(((1,0,0,0),(0,-1,0,0),(0,0,1,0),(0,0,0,1)))
 #CREATE PIVOT : 
 for obj in bpy.data.objects:
     textureOffsetX = 0
@@ -80,18 +81,9 @@ for obj in bpy.data.objects:
                 
             
             position = matrixTransform.to_translation()
-            sPos = str(-round(position[0],ndigits = 1) ) + 'F,' +str(round(position[2],ndigits = 1) ) + 'F,' +str(round(position[1],ndigits = 1) ) +'F'
-      
-            '''
-            matrix = matrixTransform.to_3x3()
-            
-            if (obj.parent == None):
-                mat_rot = mathutils.Matrix.Rotation(radians(90.0), 3, 'X') 
-                mat_rot *= mathutils.Matrix.Rotation(radians(180.0), 3, 'Z') 
-                result =  mat_rot *matrix
-            else :'''
-                
             quat = (matrixTransform).to_quaternion()
+			
+            sPos = str(-round(position[0],ndigits = 1) ) + 'F,' +str(round(position[2],ndigits = 1) ) + 'F,' +str(round(position[1],ndigits = 1) ) +'F'
             squat = str(-round(quat[1],ndigits = 7) ) + 'F,' +str(round(quat[3],ndigits = 7) ) + 'F,' +str(round(quat[2],ndigits = 7) ) +'F,' +str(round(quat[0],ndigits = 7) ) +'F'
       
       
@@ -99,6 +91,7 @@ for obj in bpy.data.objects:
             sConstructor += "\n\t\t" + nameObj + ".setInitialRotationPoint (" + sPos + ");"
             sConstructor += "\n\t\t" + nameObj + ".setInitialRotationMatrix(new Matrix4f().set(new Quaternion(" + squat + ")).transpose());"
             
+            Log += '\n\t\t' + nameObj + '(' + squat + ')' + '(' + sPos+ ')'
             #uncomment and modify if you want to see bones :
             #sConstructor += "\n\t\t" + nameObj + ".mirror = false;"
             #sConstructor += "\n\t\t" + nameObj + ".addBox (-5F,-5F,-5F,10,10,50);"
@@ -229,4 +222,8 @@ sModelBase +='''
 
 fileObject = open(outputPath, 'w+')
 fileObject.write(sHeader + sModelBase)
+fileObject.close()
+
+fileObject = open(outputLog, 'w+')
+fileObject.write(Log)
 fileObject.close()
