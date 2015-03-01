@@ -74,7 +74,8 @@ for obj in bpy.data.objects:
             objParent = obj.parent
             objParentPivot = None
             if (objParent == None):
-                matrixTransform = obj.matrix_world
+                mat_rot = mathutils.Matrix.Rotation(radians(180.0), 4, 'Z') 
+                matrixTransform = mat_rot * obj.matrix_world
             else:
                 objParentPivot = bpy.data.objects[objParent.name.split('.')[0]+'.emptyPivot']
                 matrixTransform = (objParentPivot.matrix_world).inverted() * (objPivot.matrix_world )
