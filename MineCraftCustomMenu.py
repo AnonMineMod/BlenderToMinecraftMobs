@@ -106,6 +106,13 @@ class OBJECT_OT_MirrorBox(bpy.types.Operator):
                     else:
                         new_obj = duplicateMirrorObject(context.scene,obj.name+"mirror",obj)
                 new_obj["mirror_texture"] = True
+                if (hasattr(obj,'["mcbox"]')):
+                    new_obj["mcbox"] = obj["mcbox"]
+                if (hasattr(obj,'["texture_offset_x"]')):
+                    new_obj["texture_offset_x"] = obj["texture_offset_x"]
+                if (hasattr(obj,'["texture_offset_y"]')):
+                    new_obj["texture_offset_y"] = obj["texture_offset_y"]
+                    new_obj["mcbox"] = obj["mcbox"]
         return{'FINISHED'}  
     
     #Define the element as a MineCraft Box
