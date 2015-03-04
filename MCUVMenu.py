@@ -376,12 +376,12 @@ def createTexture():
     for obj in bpy.data.objects:
         if (hasattr(obj,'["mcbox"]')):
             
-            width = int(obj.dimensions[0])
-            height = int(obj.dimensions[2])
-            depth = int(obj.dimensions[1])            
+            width = int(round(obj.dimensions[0]))
+            height = int(round(obj.dimensions[2]))
+            depth = int(round(obj.dimensions[1]))          
             
-            texOffsetX = int(obj['texture_offset_x'])
-            texOffsetY = int(obj['texture_offset_y'])
+            texOffsetX = int(round(obj['texture_offset_x']))
+            texOffsetY = int(round(obj['texture_offset_y']))
             
             initY = texHeight - texOffsetY - height - depth
             a = 1.0
@@ -436,14 +436,14 @@ def roundTextureOffset():
     for obj in bpy.data.objects:
         if (hasattr(obj,'["mcbox"]') and obj.type == "MESH"):
             for data in obj.data.uv_layers.active.data:
-                data.uv[0] = floor(data.uv[0]*texWidth)/texWidth
-                data.uv[1] = floor(data.uv[1]*texHeight)/texHeight
+                data.uv[0] = round(data.uv[0]*texWidth)/texWidth
+                data.uv[1] = round(data.uv[1]*texHeight)/texHeight
             setIndividualsUvs(obj)  
     
         if (hasattr(obj,'["texture_offset_x"]')):
-            obj["texture_offset_x"] = floor(obj["texture_offset_x"])
+            obj["texture_offset_x"] = round(obj["texture_offset_x"])
         if (hasattr(obj,'["texture_offset_y"]')):
-            obj["texture_offset_y"] = floor(obj["texture_offset_y"])          
+            obj["texture_offset_y"] = round(obj["texture_offset_y"])          
                 
 
 def getMinUv(data):
