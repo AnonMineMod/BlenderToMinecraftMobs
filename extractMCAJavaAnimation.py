@@ -14,8 +14,8 @@ extractActionName = 'roar'
 scene = bpy.context.scene
 fullName = bpy.path.basename(bpy.context.blend_data.filepath)
 name = os.path.splitext(fullName)[0]
-sTextureWidth = str(1024)
-sTextureHeight = str(512)
+sTextureWidth = str(2048)
+sTextureHeight = str(2048)
 package = "anonmine.beastmod"
 outputPath = r'C:\test\Channel' + extractActionName.title() + '.java'
 outputLog = r'C:\test\log'+ extractActionName.title()+'.log'
@@ -68,7 +68,8 @@ def extractKeyFrame(obj,frameName):
             objParentPivot = None
             if (objParent == None):
                 mat_rot = mathutils.Matrix.Rotation(radians(180.0), 4, 'Z') 
-                matrixTransform = mat_rot * obj.matrix_world
+                mat_trans = mathutils.Matrix.Translation((0,0,ztrans))
+                matrixTransform = mat_rot * mat_trans * obj.matrix_world
             else:
                 objParentPivot = bpy.data.objects[objParent.name.split('.')[0]+'.emptyPivot']
                 matrixTransform = (objParentPivot.matrix_world).inverted() * (objPivot.matrix_world )

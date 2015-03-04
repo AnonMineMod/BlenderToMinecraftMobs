@@ -9,12 +9,12 @@ from math import pi
 
 fullName = bpy.path.basename(bpy.context.blend_data.filepath)
 name = os.path.splitext(fullName)[0]
-sTextureWidth = str(2048)
-sTextureHeight = str(2048)
+sTextureWidth = str(256)
+sTextureHeight = str(256)
 package = "anonmine.beastmod"
-outputPath = r'C:\test\\' + name + '.java'
+outputPath = r'C:\test\Model' + name.title() + '.java'
 outputLog = r'C:\test\log' + name + '.log'
-
+ztrans= -12
 Log = " "
 
 sHeader = '''
@@ -75,7 +75,8 @@ for obj in bpy.data.objects:
             objParentPivot = None
             if (objParent == None):
                 mat_rot = mathutils.Matrix.Rotation(radians(180.0), 4, 'Z') 
-                matrixTransform = mat_rot * obj.matrix_world
+                mat_trans = mathutils.Matrix.Translation((0,0,ztrans))
+                matrixTransform = mat_rot * mat_trans * obj.matrix_world
             else:
                 objParentPivot = bpy.data.objects[objParent.name.split('.')[0]+'.emptyPivot']
                 matrixTransform = (objParentPivot.matrix_world).inverted() * (objPivot.matrix_world )
@@ -128,7 +129,9 @@ for obj in bpy.data.objects:
             mirrorTexture = bool(obj["mirror_texture"])
         
         if (obj.parent == None):
-            matrixTransform = obj.matrix_world
+            mat_rot = mathutils.Matrix.Rotation(radians(180.0), 4, 'Z') 
+            mat_trans = mathutils.Matrix.Translation((0,0,ztrans))
+            matrixTransform = mat_rot * mat_trans * obj.matrix_world
         else:
             matrixTransform = obj.matrix_basis
         
