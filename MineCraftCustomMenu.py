@@ -98,7 +98,13 @@ class OBJECT_OT_MirrorBox(bpy.types.Operator):
         print("test2")
         for obj in bpy.context.selected_objects:
             if (obj.type == "MESH"):
-                new_obj = duplicateMirrorObject(context.scene,obj.name+"mirror",obj)
+                if (obj.name.endswith("_L")):
+                    new_obj = duplicateMirrorObject(context.scene,obj.name[:-2]+"_R",obj)
+                else:
+                    if (obj.name.endswith("_R")):
+                        new_obj = duplicateMirrorObject(context.scene,obj.name[:-2]+"_L",obj)
+                    else:
+                        new_obj = duplicateMirrorObject(context.scene,obj.name+"mirror",obj)
                 new_obj["mirror_texture"] = True
         return{'FINISHED'}  
     
