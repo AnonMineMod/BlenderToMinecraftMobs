@@ -5,8 +5,6 @@ This repository combine all python files needed to export model and animation fr
 I. File list
 ------------
 
-
-
 extractMCAJavaAnimation.py 	:  		extract the current action in a java file for MCA
 MCAJavaExportAdvance.py 	:		export the model in java for MCA
 ResetRTTR			:		replace bone parenting by empty then parent those empty with bones
