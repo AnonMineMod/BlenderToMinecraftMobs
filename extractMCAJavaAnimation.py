@@ -10,7 +10,7 @@ from math import pi
 
 import time
 
-extractActionName = 'roar'
+extractActionName = 'walking'
 scene = bpy.context.scene
 fullName = bpy.path.basename(bpy.context.blend_data.filepath)
 name = os.path.splitext(fullName)[0]
@@ -19,6 +19,7 @@ sTextureHeight = str(2048)
 package = "anonmine.beastmod"
 outputPath = r'C:\test\Channel' + extractActionName.title() + '.java'
 outputLog = r'C:\test\log'+ extractActionName.title()+'.log'
+ztrans = -8
 
 Log = " "
 
