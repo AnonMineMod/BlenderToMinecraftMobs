@@ -590,6 +590,13 @@ class SpaceList:
     def __init__(self):
         self.list = []
         self.rectList = []
+        self.boundaryx = 0
+        self.boundaryy = 0
+    def clear(self):
+        self.list = []
+        self.rectList = []
+        self.boundaryx = 0
+        self.boundaryy = 0
     def clearUnuseableSpace(self,interspace=1):
         listToRemove = []
         for s in self.list:
@@ -606,50 +613,72 @@ class SpaceList:
                                 listToRemove.append(s2)
         for s in listToRemove:
             self.list.remove(s)
+            
+            
     def getFullSpaceSize(self):
-        sizeX = 0
-        sizeY = 0
-        for r in self.rectList:
-            if (r.x+r.width > sizeX):
-                sizeX = r.x+r.width
-            if (r.y+r.height > sizeY):
-                sizeY = r.y+r.height
-        return sizeX,sizeY
+                
+        return boundaryx,boundaryy
     def printListSizes(self):
         print("space size" + str(len(self.list)))
         print("rect size" + str(len(self.rectList)))
-    def getSmallestSpaceFor(self,rect):
-        areamax = sys.maxsize
-        posx = 0
-        posy = 0
+
+    def getBestGreedySpace(self,rect):
+        subList = self.getMinMaxPow2Size(rect)
+        space = self.getMinMaxDistanceFor(rect,subList)
+        return (space.x,space.y)
+            
+    def getMinMaxPow2Size(self,rect):
+        spaceList = SpaceList()
+        maxAir = sys.maxsize
+        
         for s in self.list:
-            area = s.calculateArea()
-            if (s.checkPlace(rect) and areamax>area):
-                rect.x = s.x
-                rect.y = s.y
-                for s2 in self.list:
-                    if (s2.overlap(rect)):
-                        area2 = s2.calculateArea()
-                        if (area2>area):
-                            area = area2
-                if (areamax>area):
-                    areamax = area
-                    posx = s.x
-                    posy = s.y
-        return (posx,posy)
-    
-    def getBestGreedyDistanceSpaceFor(self,rect):
+            
+            maxx = max(closestPower2(s.x+rect.width) , closestPower2(self.boundaryx) )
+            maxy = max(closestPower2(s.y+rect.height) , closestPower2(self.boundaryy) )
+            
+            mAir = maxx * maxy
+            
+            if (s.checkPlace(rect)):
+                if (maxAir == mAir):
+                    spaceList.append(s)
+                elif(maxAir > mAir):
+                    maxAir = mAir
+                    spaceList.clear()
+                    spaceList.append(s)
+                
+        return spaceList
+        
+    def getMinMaxDistanceFor(self,rect,spaceList):
         maxPos = sys.maxsize
-        posx = 0
-        posy = 0
-        for s in self.list:
+        space = None
+        for s in spaceList.getList():
             mpos = max(s.x+rect.width,s.y+rect.height)
-            #print(str(s.x+rect.width) +" " +str(s.y+rect.height)+" "+str(mpos))
             if (s.checkPlace(rect) and maxPos > mpos):
                 maxPos = mpos
-                posx = s.x
-                posy = s.y
-        return (posx,posy)
+                space = s
+        return space
+        
+    def getMinMaxAirFor(self,rect,spaceList):
+        posx = 0
+        posy = 0
+        airmax = sys.maxsize
+        air = 0
+        space = None
+        for s in spaceList.getList():
+            air = s.calculateAir()
+            if (s.checkPlace(rect) and airmax>air):
+                rect.x = s.x
+                rect.y = s.y
+                #take the biggest
+                for s2 in self.list:
+                    if (rect.overlap(s2)):
+                        air2 = s2.calculateAir()
+                        if (air2 > air):
+                            air = air2
+                if (airmax>air):
+                    air = airmax
+                    space = s
+        return space  
         
     def append(self,space):
         self.appendSafe(space)
@@ -709,6 +738,11 @@ class SpaceList:
         for slist in listToAdd:
             #print("ADDING SPACES2")
             self.appendList(slist)
+            
+        if (self.boundaryx < rect2.x + rect2.width):
+            self.boundaryx = rect2.x+rect2.width
+        if (self.boundaryy < rect2.y + rect2.height):
+            self.boundaryy = rect2.y+rect2.height
             
     def removeRect(self,rect):
         self.rectList.append(rect)

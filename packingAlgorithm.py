@@ -147,6 +147,10 @@ class SpaceList:
         subList = self.getMinMaxPow2Size(rect)
         space = self.getMinMaxAirFor(rect,subList)
         return (space.x,space.y)
+    def getBestGreedyDistancePower2AndDistanceSpaceFor(self,rect):
+        subList = self.getMinMaxPow2Size(rect)
+        space = self.getMinMaxDistanceFor(rect,subList)
+        return (space.x,space.y)
 
     def getMinMaxPow2Size(self,rect):
         spaceList = SpaceList()
@@ -155,9 +159,9 @@ class SpaceList:
         for s in self.list:
             
             maxx = max(closestPower2(s.x+rect.width) , closestPower2(self.boundaryx) )
-            maxy = max(closestPower2(s.y+rect.height) , closestPower2(self.boundaryx) )
+            maxy = max(closestPower2(s.y+rect.height) , closestPower2(self.boundaryy) )
             
-            mAir = maxx + maxy
+            mAir = maxx * maxy
             
             if (s.checkPlace(rect)):
                 if (maxAir == mAir):
@@ -169,6 +173,15 @@ class SpaceList:
                 
         return spaceList
         
+    def getMinMaxDistanceFor(self,rect,spaceList):
+        maxPos = sys.maxsize
+        space = None
+        for s in spaceList.getList():
+            mpos = max(s.x+rect.width,s.y+rect.height)
+            if (s.checkPlace(rect) and maxPos > mpos):
+                maxPos = mpos
+                space = s
+        return space
         
     def getMinMaxAirFor(self,rect,spaceList):
         posx = 0
@@ -317,8 +330,8 @@ class cubeRect(Space):
 
 
 pygame.init()
-sizeX = 680
-sizeY = 480
+sizeX = 1024
+sizeY = 1024
 
 screen = pygame.display.set_mode((sizeX,sizeY))
 screen.fill((50,50,50))
@@ -351,7 +364,7 @@ while (True):
                     if (add):
                         rect = cubeRect(sizeX,sizeY)
                         rectList.append(rect)
-                        posx,posy = spaceList.getBestGreedyDistancePower2AndAirSpaceFor(rect)
+                        posx,posy = spaceList.getBestGreedyDistancePower2AndDistanceSpaceFor(rect)
                         rect.x = posx
                         rect.y = posy
                         spaceList.removeCubeRect(rect)
