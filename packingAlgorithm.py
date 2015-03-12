@@ -216,20 +216,30 @@ class SpaceList:
         for s in aList.getList():
             self.append(s)
             
-    def appendSafe(self,space):
+    def appendSafe(self,space,interspace = 0):
         toAdd = True
         listToRemove = []
-        for r in self.rectList:
-            if r.overlap(space):
-                toAdd = False
+        if (space.height <= 2+interspace or space.width <= 4+interspace):
+            toAdd=False
+        if (toAdd):
+            for r in self.rectList:
+                if r.overlap(space):
+                    toAdd = False
         if (toAdd):
             for s in self.list:
                 if (space.include(s)):
                     listToRemove.append(s)
                 elif(s.include(space)):
                     toAdd = False
+                else:
+                    comb = space.combine(s)
+                    if ( not comb is None):
+                        space = comb
+                        listToRemove.append(s)
         if (toAdd):
             self.list.append(space)
+        for s in listToRemove:
+            self.list.remove(s)
                 
     def removeCubeRect(self,rect):
         #self.rectList.append(rect)
