@@ -489,7 +489,9 @@ def setTextureOffsetIdProp():
 #########################################
 
 def closestPower2(value):
-    return pow(2,ceil(log(value,2)))
+    if (value == 0):
+        return value
+    return pow(2,math.ceil(math.log(value,2)))   
 
 def flipName(inString):
     ns=len(inString)
@@ -597,6 +599,7 @@ class SpaceList:
         self.rectList = []
         self.boundaryx = 0
         self.boundaryy = 0
+    #NOT USED ANYMORE : 
     def clearUnuseableSpace(self,interspace=1):
         listToRemove = []
         for s in self.list:
@@ -613,7 +616,7 @@ class SpaceList:
                                 listToRemove.append(s2)
         for s in listToRemove:
             self.list.remove(s)
-            
+      
             
     def getFullSpaceSize(self):
                 
@@ -690,20 +693,30 @@ class SpaceList:
         for s in aList.getList():
             self.append(s)
             
-    def appendSafe(self,space):
+    def appendSafe(self,space,interspace =0):
         toAdd = True
         listToRemove = []
-        for r in self.rectList:
-            if r.overlap(space):
-                toAdd = False
+        if (space.height <= 2+interspace or space.width <= 4+interspace):
+            toAdd=False
+        if (toAdd):
+            for r in self.rectList:
+                if r.overlap(space):
+                    toAdd = False
         if (toAdd):
             for s in self.list:
                 if (space.include(s)):
                     listToRemove.append(s)
                 elif(s.include(space)):
                     toAdd = False
+                else:
+                    comb = space.combine(s)
+                    if ( not comb is None):
+                        space = comb
+                        listToRemove.append(s)
         if (toAdd):
             self.list.append(space)
+        for s in listToRemove:
+            self.list.remove(s)
                 
     def removeCubeRect(self,rect):
         #self.rectList.append(rect)
@@ -858,12 +871,12 @@ def autoPacking():
     for key in rectDict:
         rect = rectDict[key]
         print(rect)
-        posx,posy = spaceList.getBestGreedyDistanceSpaceFor(rect)
+        posx,posy = spaceList.getBestGreedySpace(rect)
         rect.x = posx
         rect.y = posy
         spaceList.removeCubeRect(rect)
         rectList.append(rect)
-        spaceList.clearUnuseableSpace()
+        #spaceList.clearUnuseableSpace()
         
         for r in rectList:
             for r2 in rectList:
